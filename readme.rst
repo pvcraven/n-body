@@ -3,7 +3,7 @@ N-Body Simulator
 
 N-Body simulator. Simulates the gravitational interaction of a bunch of stars.
 
-.. image:: screenshot.pn
+.. image:: screenshot.png
 
 Uses:
 
