@@ -4,7 +4,7 @@ N-Body Simulator
 This simulates the gravitational interaction of a bunch of stars.
 It is an "N-Body simulator".
 
-.. image:: screenshot.png
+.. image:: screenshots/screenshot.png
 
 The simulator uses/depends on:
 
@@ -20,9 +20,9 @@ There are a couple different initial star setups you can try.
 
 .. figure:: galaxies.png
 
-   gen_galaxies_colliding function
+   screenshots/gen_galaxies_colliding function
 
 
 .. figure:: gen_random_space.png
 
-   gen_random_space function
+   screenshots/gen_random_space function
