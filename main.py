@@ -34,7 +34,7 @@ class MyWindow(arcade.Window):
         # --- Class instance variables
 
         # Number of balls to move
-        self.num_balls = 60000
+        self.num_stars = 60000
 
         # This has something to do with how we break the calculations up
         # and parallelize them.
@@ -50,8 +50,8 @@ class MyWindow(arcade.Window):
         buffer_format = "4f 4x4 4f"
         # Generate the initial data that we will put in buffer 1.
         # Pick one of these or make your own function
-        # initial_data = self.gen_random_space()
-        initial_data = self.gen_galaxies_colliding()
+        initial_data = self.gen_random_space()
+        # initial_data = self.gen_galaxies_colliding()
 
         # Create data buffers for the compute shader
         # We ping-pong render between these two buffers
@@ -144,7 +144,7 @@ class MyWindow(arcade.Window):
     def gen_random_space(self):
         radius = 3.0
 
-        for i in range(self.num_balls):
+        for i in range(self.num_stars):
             # Position/radius
 
             yield random.random() * WINDOW_WIDTH
@@ -166,7 +166,7 @@ class MyWindow(arcade.Window):
 
     def gen_galaxies_colliding(self):
         radius = 3.0
-        for i in range(self.num_balls):
+        for i in range(self.num_stars):
             # Position/radius
             angle = random.random() * math.pi * 2
             angle2 = random.random() * math.pi * 2
