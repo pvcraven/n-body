@@ -1,8 +1,10 @@
 N-Body Simulator
 ================
 
-This simulates the gravitational interaction of a bunch of stars.
+This simulates the gravitational interaction of a bunch of stars
+using Python and GLSL.
 It is an "N-Body simulator".
+By using the GPU, it is reasonably performant compared to a CPU-only version.
 
 .. image:: screenshots/screenshot.png
 
