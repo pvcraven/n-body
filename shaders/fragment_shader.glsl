@@ -2,6 +2,7 @@
 
 in vec2 g_uv;
 in vec3 g_color;
+in float g_strength;
 
 out vec4 out_color;
 
@@ -14,10 +15,10 @@ void main()
     }
     float alpha;
     if (l == 0.0)
-        alpha = 1.0;
-    else
-        alpha = min(1.0, .60-l * 2);
-
+        alpha = g_strength;
+    else {
+        alpha = min(1.0, g_strength - (l * 2));
+    }
     vec3 c = g_color.rgb;
     // c.xy += v_uv.xy * 0.05;
     // c.xy += v_pos.xy * 0.75;

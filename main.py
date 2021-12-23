@@ -8,26 +8,33 @@ from array import array
 import arcade
 from arcade.gl import BufferDescription
 
-# Size of performance graphs and distance between them
+# Window dimensions
+WINDOW_WIDTH = 2300
+WINDOW_HEIGHT = 1300
+
+# Size of performance graphs
 GRAPH_WIDTH = 200
 GRAPH_HEIGHT = 120
 GRAPH_MARGIN = 5
 
-arcade.enable_timings()
+STARFIELD_RADIUS = 275
 
 
 class MyWindow(arcade.Window):
 
     def __init__(self):
         # Call parent constructor
-        super().__init__(2300, 1300, "Compute Shader", gl_version=(4, 3), resizable=True)
+        # Ask for OpenGL 4.3 context, as we need that for compute shader support.
+        super().__init__(WINDOW_WIDTH, WINDOW_HEIGHT,
+                         "Compute Shader",
+                         gl_version=(4, 3),
+                         resizable=True)
         self.center_window()
 
         # --- Class instance variables
-        # How long we have been running, in seconds
-        self.run_time = 0
+
         # Number of balls to move
-        self.num_balls = 40000
+        self.num_balls = 60000
 
         # This has something to do with how we break the calculations up
         # and parallelize them.
@@ -64,7 +71,7 @@ class MyWindow(arcade.Window):
         # --- Create shaders
 
         # Load in the shader source code
-        file = open("shaders/compute_shader2.glsl")
+        file = open("shaders/compute_shader.glsl")
         compute_shader_source = file.read()
         file = open("shaders/vertex_shader.glsl")
         vertex_shader_source = file.read()
@@ -73,9 +80,12 @@ class MyWindow(arcade.Window):
         file = open("shaders/geometry_shader.glsl")
         geometry_shader_source = file.read()
 
-        # Create our compute shader
-        compute_shader_source = compute_shader_source.replace("COMPUTE_SIZE_X", str(self.group_x))
-        compute_shader_source = compute_shader_source.replace("COMPUTE_SIZE_Y", str(self.group_y))
+        # Create our compute shader.
+        # Search/replace to set up our compute groups
+        compute_shader_source = compute_shader_source.replace("COMPUTE_SIZE_X",
+                                                              str(self.group_x))
+        compute_shader_source = compute_shader_source.replace("COMPUTE_SIZE_Y",
+                                                              str(self.group_y))
         self.compute_shader = self.ctx.compute_shader(source=compute_shader_source)
 
         # Program for visualizing the balls
@@ -84,6 +94,11 @@ class MyWindow(arcade.Window):
             geometry_shader=geometry_shader_source,
             fragment_shader=fragment_shader_source,
         )
+
+        # --- Create FPS graph
+
+        # Enable timings for the performance graph
+        arcade.enable_timings()
 
         # Create a sprite list to put the performance graph into
         self.perf_graph_list = arcade.SpriteList()
@@ -95,18 +110,17 @@ class MyWindow(arcade.Window):
         self.perf_graph_list.append(graph)
 
     def on_draw(self):
+        # Clear the screen
         self.clear()
+        # Enable blending so our alpha channel works
         self.ctx.enable(self.ctx.BLEND)
-
-        # Change the force
-        force = math.sin(self.run_time / 10) / 2, math.cos(self.run_time / 10) / 2
-        force = 0.0, 0.0
 
         # Bind buffers
         self.ssbo_1.bind_to_storage_buffer(binding=0)
         self.ssbo_2.bind_to_storage_buffer(binding=1)
 
         # Set input variables for compute shader
+        # These are examples, although this example doesn't use them
         # self.compute_shader["screen_size"] = self.get_size()
         # self.compute_shader["force"] = force
         # self.compute_shader["frame_time"] = self.run_time
@@ -125,48 +139,34 @@ class MyWindow(arcade.Window):
         # Draw the graphs
         self.perf_graph_list.draw()
 
-        # Get FPS for the last 60 frames
-        text = f"FPS: {arcade.get_fps(60):5.1f}"
-        arcade.draw_text(text, 10, 10, arcade.color.BLACK, 22)
-
-    def on_update(self, delta_time: float):
-        self.run_time = delta_time
-
     def gen_initial_data(self):
         for i in range(self.num_balls):
             # Position/radius
-            yield random.randrange(0, self.width)
-            yield random.randrange(0, self.height)
-            yield 0.0  # z (padding)
-            yield 6.0
+            angle = random.random() * math.pi * 2
+            angle2 = random.random() * math.pi * 2
+            distance = random.random() * STARFIELD_RADIUS
+
+            if i % 2 == 0:
+                yield distance * math.cos(angle) - STARFIELD_RADIUS
+            else:
+                yield distance * math.cos(angle) + STARFIELD_RADIUS + WINDOW_WIDTH
+            yield distance * math.sin(angle) + WINDOW_HEIGHT / 2
+            yield distance * math.sin(angle2)
+            yield 2.0
 
             # Velocity
-            v = 0.001
-            angle = (i / self.num_balls) * math.pi * 2.0
-            yield math.cos(angle) * v  # vx
-            yield math.sin(angle) * v  # vy
-            # yield 0.0  # vz (padding)
-            # yield 0.0  # vw (padding)
-            yield 0.0  # vz (padding)
+            yield math.cos(angle + math.pi / 2) * distance / 100
+            yield math.sin(angle + math.pi / 2) * distance / 100
+            yield math.sin(angle2 + math.pi / 2) * distance / 100
             yield 0.0  # vw (padding)
 
             # Color
-            # yield 1.0 * random.random()  # r
-            # yield 1.0 * random.random()  # g
-            # yield 1.0 * random.random()  # b
-            # colors = "#68632e", "#FFFFFF", "#c9d1fc", "#c9d1fc"
-            # hex_color = random.choice(colors)
-            hex_color = "#FFFFFF"
-            color_b = arcade.color_from_hex_string(hex_color)
-            color_f = arcade.get_four_float_color(color_b)
-            yield color_f[0]
-            yield color_f[1]
-            yield color_f[2]
-
-            # yield 1.0  # a
-            # yield 1.0  # a
-            # yield 1.0  # a
+            yield 1.0  # r
+            yield 1.0  # g
+            yield 1.0  # b
             yield 1.0  # a
+
+
 
 
 app = MyWindow()

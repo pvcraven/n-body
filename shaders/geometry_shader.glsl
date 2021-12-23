@@ -11,13 +11,16 @@ uniform Projection {
 in vec2 vertex_pos[];
 in vec4 vertex_color[];
 in float vertex_radius[];
+in float v_strength[];
 
 out vec2 g_uv;
 out vec3 g_color;
+out float g_strength;
 
 void main() {
     vec2 center = vertex_pos[0];
     vec2 hsize = vec2(vertex_radius[0]);
+    g_strength = v_strength[0];
 
     g_color = vertex_color[0].rgb;
 
