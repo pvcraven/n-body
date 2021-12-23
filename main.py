@@ -49,7 +49,9 @@ class MyWindow(arcade.Window):
         # 4f = color -> rgba
         buffer_format = "4f 4x4 4f"
         # Generate the initial data that we will put in buffer 1.
-        initial_data = self.gen_initial_data()
+        # Pick one of these or make your own function
+        # initial_data = self.gen_random_space()
+        initial_data = self.gen_galaxies_colliding()
 
         # Create data buffers for the compute shader
         # We ping-pong render between these two buffers
@@ -139,20 +141,45 @@ class MyWindow(arcade.Window):
         # Draw the graphs
         self.perf_graph_list.draw()
 
-    def gen_initial_data(self):
+    def gen_random_space(self):
+        radius = 3.0
+
+        for i in range(self.num_balls):
+            # Position/radius
+
+            yield random.random() * WINDOW_WIDTH
+            yield random.random() * WINDOW_HEIGHT
+            yield random.random() * WINDOW_HEIGHT
+            yield radius
+
+            # Velocity
+            yield 0.0
+            yield 0.0
+            yield 0.0
+            yield 0.0  # vw (padding)
+
+            # Color
+            yield 1.0  # r
+            yield 1.0  # g
+            yield 1.0  # b
+            yield 1.0  # a
+
+    def gen_galaxies_colliding(self):
+        radius = 3.0
         for i in range(self.num_balls):
             # Position/radius
             angle = random.random() * math.pi * 2
             angle2 = random.random() * math.pi * 2
             distance = random.random() * STARFIELD_RADIUS
 
+            # Alternate stars between galaxies
             if i % 2 == 0:
                 yield distance * math.cos(angle) - STARFIELD_RADIUS
             else:
                 yield distance * math.cos(angle) + STARFIELD_RADIUS + WINDOW_WIDTH
             yield distance * math.sin(angle) + WINDOW_HEIGHT / 2
             yield distance * math.sin(angle2)
-            yield 2.0
+            yield radius
 
             # Velocity
             yield math.cos(angle + math.pi / 2) * distance / 100
@@ -165,8 +192,6 @@ class MyWindow(arcade.Window):
             yield 1.0  # g
             yield 1.0  # b
             yield 1.0  # a
-
-
 
 
 app = MyWindow()
