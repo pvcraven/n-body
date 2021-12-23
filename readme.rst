@@ -18,11 +18,11 @@ A longer tutorial is available on the
 You can adjust the ``num_stars`` parameter if your hardware is running this too slow.
 There are a couple different initial star setups you can try.
 
-.. image:: galaxies
+.. figure:: galaxies.png
 
    gen_galaxies_colliding function
 
 
-.. image:: gen_random_space
+.. figure:: gen_random_space.png
 
    gen_random_space function
